@@ -8,7 +8,7 @@ class ConfigComponent : public juce::Component
 public:
     ConfigComponent()
     {
-        auto pathSettingFile = Config::getSettingsFile();
+        auto pathSettingFile = Config::getPathSettingsFile();
         if (pathSettingFile.existsAsFile())
             pathLabel.setText(pathSettingFile.loadFileAsString(), juce::dontSendNotification);
         else
@@ -31,19 +31,30 @@ public:
                                      {
                                          if (fc.getResult().exists())
                                          {
-                                             auto pathSettingFile = Config::getSettingsFile();
-                                             pathSettingFile.replaceWithText(fc.getResult().getFullPathName());
+                                             auto pathSettingFile = Config::getPathSettingsFile();
+                                             (void) pathSettingFile.replaceWithText(fc.getResult().getFullPathName());
                                              pathLabel.setText(fc.getResult().getFullPathName(), juce::dontSendNotification);
                                              configPreview.reset();
                                          }
                                      });
         };
 
+        addAndMakeVisible(timeLabel);
+        timeLabel.setColour(juce::Label::ColourIds::textColourId, juce::Colours::black);
+        addAndMakeVisible(timeSlider);
+        timeSlider.setRange(3, 15, 1);
+        timeSlider.setValue(Config::getTimeSetting());
+        timeSlider.onValueChange = [this]
+        {
+            Config::getTimeSettingsFile().replaceWithText(juce::String(timeSlider.getValue()));
+        };
+
         addAndMakeVisible(previewButton);
+        previewButton.onClick = [this] { previewFullscreen(); };
 
         addAndMakeVisible(configPreview);
 
-        setSize(600, 400);
+        setSize(500, 450);
     }
 
     void resized() override
@@ -63,6 +74,13 @@ public:
 
         bounds.removeFromTop(5);
 
+        auto timeBounds = bounds.removeFromTop(30);
+        timeLabel.setBounds(timeBounds.removeFromLeft(150));
+        timeBounds.removeFromLeft(10);
+        timeSlider.setBounds(timeBounds);
+
+        bounds.removeFromTop(5);
+
         previewButton.setBounds(bounds.removeFromTop(30).removeFromLeft(100));
 
         auto previewBounds = bounds.reduced(20);
@@ -75,24 +93,45 @@ public:
     }
 
 private:
+    void previewFullscreen()
+    {
+        const auto& displays = juce::Desktop::getInstance().getDisplays().displays;
+        for (const auto& display : displays)
+        {
+            auto saver = std::make_unique<SaverComponent>(false, [this] { stopPreview(); });
+            auto screenBounds = display.totalArea;
+            saver->setOpaque(true);
+            saver->setBounds(screenBounds);
+            saver->addToDesktop(0);
+            saver->setVisible(true);
+            saver->toFront(true);
+            savers.push_back(std::move(saver));
+        }
+    }
+
+    void stopPreview() { savers.clear(); }
+
     juce::Label imagesLabel { "images", "Images to use:" };
     juce::Label pathLabel;
     juce::TextButton setPathButton { "Choose" };
     juce::TextButton previewButton { "Preview" };
+    juce::Label timeLabel { "time", "Time between images:" };
+    juce::Slider timeSlider { juce::Slider::SliderStyle::LinearHorizontal, juce::Slider::TextEntryBoxPosition::TextBoxLeft };
     SaverComponent configPreview { true, [] { } };
 
     std::unique_ptr<juce::FileChooser> filechooser;
+    std::vector<std::unique_ptr<SaverComponent>> savers;
 };
 
 class ConfigWindow : public juce::DocumentWindow
 {
 public:
-    ConfigWindow(juce::String name)
+    explicit ConfigWindow(const juce::String& name)
         : juce::DocumentWindow(name, juce::Colours::grey, juce::DocumentWindow::allButtons)
     {
         setUsingNativeTitleBar(true);
         setContentOwned(new ConfigComponent(), true);
-        setVisible(true);
+        DocumentWindow::setVisible(true);
         centreWithSize(getWidth(), getHeight());
     }
 

@@ -1,13 +1,32 @@
 #pragma once
 
+#include <juce_core/juce_core.h>
+
 namespace Config
 {
-    static juce::File getSettingsFile()
+    static juce::File getPathSettingsFile()
     {
-        auto pathSettingFolder = juce::File::getSpecialLocation(juce::File::SpecialLocationType::userApplicationDataDirectory)
+        auto settingsFolder = juce::File::getSpecialLocation(juce::File::SpecialLocationType::userApplicationDataDirectory)
                                      .getChildFile("ScreenSaver");
-        if (!pathSettingFolder.exists())
-            pathSettingFolder.createDirectory();
-        return pathSettingFolder.getChildFile("images.path");
+        if (!settingsFolder.exists())
+            (void) settingsFolder.createDirectory();
+        return settingsFolder.getChildFile("images.path");
     }
-}
+
+    static juce::File getTimeSettingsFile()
+    {
+        auto settingsFolder = juce::File::getSpecialLocation(juce::File::SpecialLocationType::userApplicationDataDirectory)
+                                     .getChildFile("ScreenSaver");
+        if (!settingsFolder.exists())
+            (void) settingsFolder.createDirectory();
+        return settingsFolder.getChildFile("images.time");
+    }
+
+    static int getTimeSetting()
+    {
+        auto settingsFile = getTimeSettingsFile();
+        if (settingsFile.existsAsFile())
+            return settingsFile.loadFileAsString().getIntValue();
+        return 5;
+    }
+} // namespace Config

@@ -19,6 +19,7 @@ juce_add_gui_app(ScreenSaver
 target_sources(ScreenSaver PRIVATE
     Source/Main.cpp
     Source/SaverComponent.h
+    Source/ImageComponent.h
     Source/ConfigComponent.h
     Source/Config.h
 )

@@ -2,8 +2,10 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <juce_gui_basics/juce_gui_basics.h>
-#include "SaverComponent.h"
+#include <memory>
+
 #include "ConfigComponent.h"
+#include "SaverComponent.h"
 
 class ScreensaverApplication : public juce::JUCEApplication
 {
@@ -51,7 +53,7 @@ private:
         auto screens = juce::Desktop::getInstance().getDisplays();
         for (const auto& display : screens.displays)
         {
-            auto saver = std::make_unique<SaverComponent>(false, [this] { quit(); });
+            auto saver = std::make_unique<SaverComponent>(false, [] { quit(); });
             auto screenBounds = display.totalArea;
             saver->setOpaque(true);
             saver->setBounds(screenBounds);
@@ -62,7 +64,7 @@ private:
         }
     }
 
-    void showConfigDialog() { config.reset(new ConfigWindow(getApplicationName())); }
+    void showConfigDialog() { config = std::make_unique<ConfigWindow>(getApplicationName()); }
 };
 
 START_JUCE_APPLICATION(ScreensaverApplication)

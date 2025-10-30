@@ -1,6 +1,11 @@
 #pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
+#include <numeric>
+#include <random>
+
 #include "Config.h"
+#include "ImageComponent.h"
+
 
 class SaverComponent
     : public juce::Component
@@ -17,21 +22,19 @@ public:
         setMouseClickGrabsKeyboardFocus(true);
         if (!preview)
             setMouseCursor(juce::MouseCursor::NoCursor);
-        startTimerHz(60);
         lastMousePos = juce::Desktop::getInstance().getMainMouseSource().getScreenPosition();
+        startTimerHz(60);
     }
 
     void reset()
     {
-        currentImageIndex = -1;
         imagePaths.clear();
-        auto settingsFile = Config::getSettingsFile();
+        imageIndices.clear();
+        auto settingsFile = Config::getPathSettingsFile();
         auto imagesPath = juce::File(settingsFile.loadFileAsString());
         if (imagesPath.exists())
         {
             imagePaths = imagesPath.findChildFiles(juce::File::TypesOfFileToFind::findFiles, true, "*.jpg");
-            currentImageIndex = random.nextInt(imagePaths.size());
-            DBG(imagePaths[currentImageIndex].getFullPathName());
         }
     }
 
@@ -45,7 +48,8 @@ private:
     std::function<void()> onExit;
     bool preview;
     juce::Array<juce::File> imagePaths;
-    int currentImageIndex = -1;
+    std::vector<int> imageIndices;
+    std::vector<std::unique_ptr<ImageComponent>> imageComponents;
 
     juce::Random random;
 
@@ -55,11 +59,47 @@ private:
         if (!preview && mousePos.getDistanceFrom(lastMousePos) > 5.0f)
             triggerExit();
 
-        if (currentImageIndex != -1)
+        if (imageIndices.empty())
         {
+            imageIndices.resize(imagePaths.size());
+            std::iota(imageIndices.begin(), imageIndices.end(), 0);
+            std::random_device rd;
+            std::mt19937 rng(rd());
+            std::shuffle(imageIndices.begin(), imageIndices.end(), rng);
+        }
+
+        if (imageComponents.empty() && !imageIndices.empty())
+        {
+            const auto &imagePath = imagePaths[imageIndices.front()];
+            imageIndices.pop_back();
+            auto imageComp = std::make_unique<ImageComponent>(imagePath, true, [this] { triggerNext(); });
+            imageComp->setBounds(getLocalBounds());
+            addAndMakeVisible(*imageComp);
+            imageComponents.push_back(std::move(imageComp));
+        }
+        else if (imageComponents.size() < 2 && !imageIndices.empty())
+        {
+            const auto &imagePath = imagePaths[imageIndices.back()];
+            imageIndices.pop_back();
+            auto imageComp = std::make_unique<ImageComponent>(imagePath, false, [this] { triggerNext(); });
+            imageComp->setBounds(getLocalBounds());
+            addAndMakeVisible(*imageComp);
+            imageComponents.push_back(std::move(imageComp));
+        }
+        if (!imageComponents.empty())
+        {
+            if (imageComponents.front()->isFinished())
+            {
+                imageComponents.erase(imageComponents.begin());
+            }
         }
 
         repaint();
+    }
+
+    void triggerNext()
+    {
+        imageComponents.back()->startFadeIn();
     }
 
     void mouseDown(const juce::MouseEvent&) override
