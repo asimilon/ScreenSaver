@@ -26,6 +26,7 @@ public:
         : isFirstInQueue(firstInQueue)
         , onFadeOut(std::move(fadeoutCallback))
     {
+        setInterceptsMouseClicks(false, false);
         juce::Thread::launch(juce::Thread::Priority::normal,
                              [this, path]
                              {
