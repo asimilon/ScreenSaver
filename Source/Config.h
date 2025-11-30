@@ -7,7 +7,7 @@ namespace Config
     static juce::File getPathSettingsFile()
     {
         auto settingsFolder = juce::File::getSpecialLocation(juce::File::SpecialLocationType::userApplicationDataDirectory)
-                                     .getChildFile("ScreenSaver");
+                                  .getChildFile("ScreenSaver");
         if (!settingsFolder.exists())
             (void) settingsFolder.createDirectory();
         return settingsFolder.getChildFile("images.path");
@@ -16,7 +16,7 @@ namespace Config
     static juce::File getTimeSettingsFile()
     {
         auto settingsFolder = juce::File::getSpecialLocation(juce::File::SpecialLocationType::userApplicationDataDirectory)
-                                     .getChildFile("ScreenSaver");
+                                  .getChildFile("ScreenSaver");
         if (!settingsFolder.exists())
             (void) settingsFolder.createDirectory();
         return settingsFolder.getChildFile("images.time");

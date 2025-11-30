@@ -6,7 +6,6 @@
 #include "Config.h"
 #include "ImageComponent.h"
 
-
 class SaverComponent
     : public juce::Component
     , private juce::Timer
@@ -38,10 +37,7 @@ public:
         }
     }
 
-    void paint(juce::Graphics& g) override
-    {
-        g.fillAll(juce::Colours::black);
-    }
+    void paint(juce::Graphics& g) override { g.fillAll(juce::Colours::black); }
 
 private:
     juce::Point<float> lastMousePos;
@@ -70,7 +66,7 @@ private:
 
         if (imageComponents.empty() && !imageIndices.empty())
         {
-            const auto &imagePath = imagePaths[imageIndices.front()];
+            const auto& imagePath = imagePaths[imageIndices.front()];
             imageIndices.pop_back();
             auto imageComp = std::make_unique<ImageComponent>(imagePath, true, [this] { triggerNext(); });
             imageComp->setBounds(getLocalBounds());
@@ -79,7 +75,7 @@ private:
         }
         else if (imageComponents.size() < 2 && !imageIndices.empty())
         {
-            const auto &imagePath = imagePaths[imageIndices.back()];
+            const auto& imagePath = imagePaths[imageIndices.back()];
             imageIndices.pop_back();
             auto imageComp = std::make_unique<ImageComponent>(imagePath, false, [this] { triggerNext(); });
             imageComp->setBounds(getLocalBounds());
@@ -97,10 +93,7 @@ private:
         repaint();
     }
 
-    void triggerNext()
-    {
-        imageComponents.back()->startFadeIn();
-    }
+    void triggerNext() { imageComponents.back()->startFadeIn(); }
 
     void mouseDown(const juce::MouseEvent&) override
     {

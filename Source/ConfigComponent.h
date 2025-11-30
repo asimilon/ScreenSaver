@@ -17,11 +17,16 @@ public:
         draw3Dbox(g, 0, 0, w, h, shouldDrawButtonAsDown, buttonBg);
     }
 
-    void drawLinearSlider(juce::Graphics& g, int x, int y, int width, int height,
+    void drawLinearSlider(juce::Graphics& g,
+                          int x,
+                          int y,
+                          int width,
+                          int height,
                           float sliderPos,
                           float minSliderPos,
                           float maxSliderPos,
-                          const juce::Slider::SliderStyle style, juce::Slider& slider) override
+                          const juce::Slider::SliderStyle style,
+                          juce::Slider& slider) override
     {
         const auto bgX = static_cast<float>(x);
         const auto bgH = static_cast<float>(height) / 2;
@@ -30,8 +35,14 @@ public:
         draw3Dbox(g, bgX, bgY, bgW, bgH, true, juce::Colours::grey);
 
         auto thumbWidth = getSliderThumbRadius(slider);
-        sliderPos -= (float)thumbWidth / 2;
-        draw3Dbox(g, sliderPos, float(y), float(thumbWidth), float(height), false, buttonBg);
+        sliderPos -= static_cast<float>(thumbWidth) / 2;
+        draw3Dbox(g,
+                  sliderPos,
+                  static_cast<float>(y),
+                  static_cast<float>(thumbWidth),
+                  static_cast<float>(height),
+                  false,
+                  buttonBg);
     }
 
     void draw3Dbox(juce::Graphics& g, float x, float y, float w, float h, bool isDown, const juce::Colour& fillColour)
@@ -41,19 +52,18 @@ public:
         const auto x2 = x + w;
         const auto y2 = y + h;
         g.setColour(isDown ? buttonShadow : buttonHighlight);
-        g.drawLine(x    , y    , x2    , y    , 1.0f);
+        g.drawLine(x, y, x2, y, 1.0f);
         g.drawLine(x + 1, y + 1, x2 - 1, y + 1, 1.0f);
-        g.drawLine(x    , y    , x    , y2    , 1.0f);
+        g.drawLine(x, y, x, y2, 1.0f);
         g.drawLine(x + 1, y + 1, x + 1, y2 - 1, 1.0f);
         g.setColour(isDown ? buttonHighlight : buttonShadow);
-        g.drawLine(x2    , y    , x2    , y2    , 1.0f);
+        g.drawLine(x2, y, x2, y2, 1.0f);
         g.drawLine(x2 - 1, y + 1, x2 - 1, y2 - 1, 1.0f);
-        g.drawLine(x    , y2    , x2    , y2    , 1.0f);
+        g.drawLine(x, y2, x2, y2, 1.0f);
         g.drawLine(x + 1, y2 - 1, x2 - 1, y2 - 1, 1.0f);
     }
 
 private:
-
     juce::Colour buttonBg { 0xff999999 };
     juce::Colour buttonHighlight { 0xffffffff };
     juce::Colour buttonShadow { 0xff000000 };
@@ -120,10 +130,7 @@ public:
         setSize(500, 450);
     }
 
-    ~ConfigComponent() override
-    {
-        setLookAndFeel(nullptr);
-    }
+    ~ConfigComponent() override { setLookAndFeel(nullptr); }
 
     void resized() override
     {

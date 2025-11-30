@@ -52,10 +52,7 @@ public:
     bool isFinished() const { return state == State::Finished; }
 
 private:
-    static float randomInRange(juce::Random& r, float min, float max)
-    {
-        return r.nextFloat() * (max - min) + min;
-    }
+    static float randomInRange(juce::Random& r, float min, float max) { return r.nextFloat() * (max - min) + min; }
 
     void timerCallback() override
     {
@@ -112,14 +109,17 @@ private:
     {
         zoom += zoomSpeed;
 
-        if ((zoom > 1.6f || zoom < 1.1f) && !flippingZoomDirection) {
+        if ((zoom > 1.6f || zoom < 1.1f) && !flippingZoomDirection)
+        {
             requiredZoomSpeed = zoomSpeed;
             flippingZoomDirection = true;
         }
-        if (flippingZoomDirection) {
+        if (flippingZoomDirection)
+        {
             const auto speedDelta = requiredZoomSpeed - zoomSpeed;
             zoomSpeed += speedDelta * 0.01f;
-            if (juce::approximatelyEqual(zoomSpeed, requiredZoomSpeed)) {
+            if (juce::approximatelyEqual(zoomSpeed, requiredZoomSpeed))
+            {
                 zoomSpeed = requiredZoomSpeed;
                 flippingZoomDirection = false;
             }
@@ -128,34 +128,40 @@ private:
         panX += panSpeedX;
         panY += panSpeedY;
 
-        if ((panX < 0.0f || panX > 1.0f) && !flippingDirectionX) {
+        if ((panX < 0.0f || panX > 1.0f) && !flippingDirectionX)
+        {
             requiredPanSpeedX = -panSpeedX;
             flippingDirectionX = true;
         }
-        if ((panY < 0.0f || panY > 1.0f) && !flippingDirectionY) {
+        if ((panY < 0.0f || panY > 1.0f) && !flippingDirectionY)
+        {
             requiredPanSpeedY = -panSpeedY;
             flippingDirectionY = true;
         }
 
-        if (flippingDirectionX) {
+        if (flippingDirectionX)
+        {
             const auto speedDelta = requiredPanSpeedX - panSpeedX;
             panSpeedX += speedDelta * 0.01f;
-            if (juce::approximatelyEqual(panSpeedX, requiredPanSpeedX)) {
+            if (juce::approximatelyEqual(panSpeedX, requiredPanSpeedX))
+            {
                 panSpeedX = requiredPanSpeedX;
                 flippingDirectionX = false;
             }
         }
-        if (flippingDirectionY) {
+        if (flippingDirectionY)
+        {
             const auto speedDelta = requiredPanSpeedY - panSpeedY;
             panSpeedY += speedDelta * 0.01f;
-            if (juce::approximatelyEqual(panSpeedY, requiredPanSpeedY)) {
+            if (juce::approximatelyEqual(panSpeedY, requiredPanSpeedY))
+            {
                 panSpeedY = requiredPanSpeedY;
                 flippingDirectionY = false;
             }
         }
 
         // Get image and component aspect ratios
-        auto imageAspect = (float) image.getWidth() / (float) image.getHeight();
+        auto imageAspect = static_cast<float>(image.getWidth()) / static_cast<float>(image.getHeight());
         auto compBounds = getLocalBounds().toFloat();
         auto compAspect = compBounds.getWidth() / compBounds.getHeight();
 
@@ -185,13 +191,13 @@ private:
 
     juce::Rectangle<float> targetArea;
 
-    float zoom{};
-    float zoomSpeed{};
-    float requiredZoomSpeed{};
+    float zoom {};
+    float zoomSpeed {};
+    float requiredZoomSpeed {};
     bool flippingZoomDirection = false;
-    float panX{}, panY{};
-    float panSpeedX{}, panSpeedY{};
-    float requiredPanSpeedX{}, requiredPanSpeedY{};
+    float panX {}, panY {};
+    float panSpeedX {}, panSpeedY {};
+    float requiredPanSpeedX {}, requiredPanSpeedY {};
     bool flippingDirectionX = false, flippingDirectionY = false;
 
     juce::Image image;

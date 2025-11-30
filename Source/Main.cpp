@@ -39,7 +39,8 @@ public:
     void shutdown() override
     {
         savers.clear();
-        config.reset();;
+        config.reset();
+        ;
     }
 
     void systemRequestedQuit() override { quit(); }
