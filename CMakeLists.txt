@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(ScreenSaver VERSION 1.0.1)
+project(ScreenSaver VERSION 1.0.2)
 
 include(CMake/CPM.cmake)
 
