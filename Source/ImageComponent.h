@@ -111,7 +111,7 @@ private:
 
         if ((zoom > 1.6f || zoom < 1.2f) && !flippingZoomDirection)
         {
-            requiredZoomSpeed = zoomSpeed;
+            requiredZoomSpeed = -zoomSpeed;
             flippingZoomDirection = true;
         }
         if (flippingZoomDirection)
